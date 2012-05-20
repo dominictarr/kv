@@ -1,7 +1,7 @@
 {
   "name": "kv",
   "version": "0.0.0",
-  "description": "",
+  "description": "an append oriented kv store for streams",
   "homepage": "http://github.com/dominictarr/kv",
   "repository": {
     "type": "git",
@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "optimist": "~0.3.4"
+  , "event-stream": "0.10"
+  , "mkdirp":  "0.3"
   },
   "devDependencies": {},
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)"
