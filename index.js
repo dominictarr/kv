@@ -52,8 +52,13 @@ function kvdb (basedir, streamer) {
   function get(key, opts) {
     var _key = hash(key)
     var dir  = _key.substring(0, 2)
-    var file = key
-    return streamer(fs.createReadStream(join(basedir, dir, file), opts), key)
+    return streamer(fs.createReadStream(join(basedir, dir, key), opts), key)
+  }
+
+  function has(key, callback) {
+    var _key = hash(key)
+    var dir  = _key.substring(0, 2)
+    fs.stat(join(basedir, dir, key), callback) 
   }
  
   function del(key, cb) {
@@ -74,6 +79,7 @@ function kvdb (basedir, streamer) {
   emitter.put = put
   emitter.get = get
   emitter.del = del
+  emitter.has = has
 
   return emitter
 }
@@ -85,18 +91,20 @@ if(!module.parent) {
   var key = argv._[1]
   var base = argv.base || argv.b || process.env.KV_BASE
 
-  if(!~['put', 'get', 'del'].indexOf(op)
+  if(!~['put', 'get', 'del', 'has'].indexOf(op)
     || (!key || key.length < 1) || !base) {
     var e = console.error
-    e('USAGE: kv put|get|del $KEY --base $BASEDIR')
+    e('USAGE: kv put|get|del|has $KEY --base $BASEDIR')
     e('')
     e('  source | kv put $KEY   # write a record')
     e('')
     e('  kv get $KEY | sink     # read a record')
     e('')
     e('  kv del $KEY            # delete a record')
-    e('')
+     e('')
     e('  kv get __list          # get list of changes')
+    e('')
+    e('  kv has $KEY            # test wether $KEY is in db')
     process.exit(1)
   }
 
@@ -108,5 +116,9 @@ if(!module.parent) {
     process.stdin.pipe(kv.put(key))
   else if (op == 'del')
     kv.del(key, function () {})
-
+  else if (op == 'has')
+    kv.has(key, function (err, has) {
+      if(err) console.error(err.message)
+      process.exit(has ? 0 : 1)
+    })
 }
