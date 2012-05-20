@@ -1,6 +1,6 @@
 {
   "name": "kv",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "an append oriented kv store for streams",
   "homepage": "http://github.com/dominictarr/kv",
   "repository": {
@@ -11,6 +11,9 @@
     "optimist": "~0.3.4"
   , "event-stream": "0.10"
   , "mkdirp":  "0.3"
+  },
+  "bin" : {
+    "kv": "./index.js"
   },
   "devDependencies": {},
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)"
