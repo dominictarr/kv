@@ -43,6 +43,17 @@ kv.del(key, callback)
 
 all changes are logged to a special document, `'\_\_list'`. 
 
+### has
+
+check if db has a key
+
+``` js
+  kv.has(key, function (err, stat) {
+    //return the stat of the stream, if it exists.
+  })
+
+```
+
 ### customization
 
 to handle other types of streams than newline separated json, pass in a stream setup function to kv.
