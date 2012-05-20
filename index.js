@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 /*
   very simple kv store setup for to be able to append to each document.
   each value is stored in a separate file,
@@ -82,7 +83,7 @@ if(!module.parent) {
   var argv = require('optimist').argv
   var op = (argv._[0] || '').toLowerCase()
   var key = argv._[1]
-  var base = argv.base || argv.b
+  var base = argv.base || argv.b || process.env.KV_BASE
 
   if(!~['put', 'get', 'del'].indexOf(op)
     || (!key || key.length < 1) || !base) {
