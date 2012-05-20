@@ -1,0 +1,24 @@
+# kv-stream
+
+super simple key-value store, intended for keeping appendable files.
+
+keeps the files in prefixed subdirectories, so that the directories do not get too large.
+
+(see ls .git/objects/\* for a similar example)
+
+## examples
+
+###create an instance
+
+```
+var kv = require('kv')('/tmp/kv')
+
+```
+### put a stream
+
+`opts` is optional. see [http://nodejs.org/api/fs.html#fs_fs_createreadstream_path_options ](fs.createWriteStream)
+
+``` js
+  stream.pipe(kv.put(key, opts)) //opts 
+
+```

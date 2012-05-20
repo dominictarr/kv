@@ -1,0 +1,15 @@
+{
+  "name": "kv",
+  "version": "0.0.0",
+  "description": "",
+  "homepage": "http://github.com/dominictarr/kv",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dominictarr/kv.git"
+  },
+  "dependencies": {
+    "optimist": "~0.3.4"
+  },
+  "devDependencies": {},
+  "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)"
+}
