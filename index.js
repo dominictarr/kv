@@ -22,9 +22,9 @@ function id (i) { return i }
 
 function kvdb (basedir, streamer) {
   //by default, use newline seperated json.
-  streamer = streamer || function (stream) {
+  streamer = streamer || function (stream, key) {
     var s
-    if(stream.writable) {
+    if(stream.writable) {      
       s = es.stringify()
       s.pipe(stream)
     } else
@@ -70,10 +70,10 @@ function kvdb (basedir, streamer) {
 
   var ls = put('__list', {flags: 'a'})
   emitter.on('put', function (key, time) {
-    ls.write(JSON.stringify(['put', key, time]) + '\n')
+    ls.write(['put', key, time])
   })
   emitter.on('del', function (key, time) {
-    ls.write(JSON.stringify(['del', key, time]) + '\n')
+    ls.write(['del', key, time])
   })
 
   emitter.put = put
