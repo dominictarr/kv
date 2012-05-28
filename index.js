@@ -100,7 +100,7 @@ function kvdb (basedir, streamer) {
     .on('put', addToKeys)
     .on('del', addToKeys)
 
-  emitter.get('__list').pipe(es.parse).on('data', addToKeys).on('end', function () {
+  get('__list').pipe(es.parse).on('data', addToKeys).on('end', function () {
     emitter.emit('sync')
   })
 
