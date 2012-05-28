@@ -1,6 +1,6 @@
 {
   "name": "kv",
-  "version": "0.2.1",
+  "version": "0.3.1",
   "description": "an append oriented kv store for streams",
   "homepage": "http://github.com/dominictarr/kv",
   "repository": {
