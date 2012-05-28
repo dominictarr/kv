@@ -23,6 +23,18 @@ function id (i) { return i }
 function kvdb (basedir, streamer) {
   //by default, use newline seperated json.
   streamer = streamer || function (stream, key) {
+    /*
+      if anyone ever wants to use this for something other than
+      new line seperated json, this will need to be modified.
+      because the __list record will still be a stream of arrays.
+
+      either handle it differently, by it's key,
+      or make it possible to by-pass the streamer, or add a header or something.
+      hmm. or a way to force it to write a raw stream.
+
+      or maybe just have a separate set of records for headers?
+      or the first line?
+    */
     var s
     if(stream.writable) {      
       s = es.stringify()
@@ -33,7 +45,7 @@ function kvdb (basedir, streamer) {
   }
 
   var emitter = new EventEmitter()
-
+  var keys = []
   function put (key, opts) {
     var _key = hash(key)
     var dir  = _key.substring(0, 2)
@@ -68,19 +80,35 @@ function kvdb (basedir, streamer) {
     emitter.emit('del', key, Date.now())
   }
 
+  function list() {
+    return Object.keys(keys)
+  }
+  function addToKeys (data) {
+    if(data[0] = 'put')
+      keys[key] = true
+    else
+      delete keys[key] 
+  }
   var ls = put('__list', {flags: 'a'})
-  emitter.on('put', function (key, time) {
-    ls.write(['put', key, time])
-  })
-  emitter.on('del', function (key, time) {
-    ls.write(['del', key, time])
+  emitter
+    .on('put', function (key, time) {
+      ls.write(['put', key, time])
+    })
+    .on('del', function (key, time) {
+      ls.write(['del', key, time]) 
+    })
+    .on('put', addToKeys)
+    .on('del', addToKeys)
+
+  emitter.get('__list').pipe(es.parse).on('data', addToKeys).on('end', function () {
+    emitter.emit('sync')
   })
 
   emitter.put = put
   emitter.get = get
   emitter.del = del
   emitter.has = has
-
+  emitter.list = list
   return emitter
 }
 
