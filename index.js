@@ -18,11 +18,11 @@ function hash (key) {
 
 module.exports = kvdb
 
-function id (i) { return i }
-
-function kvdb (basedir, streamer) {
-  //by default, use newline seperated json.
-  streamer = streamer || function (stream, key) {
+var formats = {
+  raw: function (stream) {
+    return stream
+  },
+  json: function (stream, key) {
     /*
       if anyone ever wants to use this for something other than
       new line seperated json, this will need to be modified.
@@ -34,6 +34,10 @@ function kvdb (basedir, streamer) {
 
       or maybe just have a separate set of records for headers?
       or the first line?
+
+      I know:
+
+        you go: get[format](key) //and can add more formats. json, raw, etc.
     */
     var s
     if(stream.writable) {      
@@ -43,7 +47,23 @@ function kvdb (basedir, streamer) {
       s = stream.pipe(es.split()).pipe(es.parse())
     return s 
   }
+}
 
+function mkFormat(fn, format) {
+  return function () {
+    return format(fn.apply(null, arguments))
+  }
+}
+
+function addFormats(fn) {
+  var f = mkFormat(fn, formats.json)
+  for(k in formats) 
+    f[k] = mkFormat(fn, formats[k])
+  return f
+}
+
+function kvdb (basedir) {
+  //by default, use newline seperated json.
   var emitter = new EventEmitter()
   var keys = []
   function put (key, opts) {
@@ -58,13 +78,13 @@ function kvdb (basedir, streamer) {
       stream.open()
     })
     emitter.emit('put', key, Date.now(), stream, opts)
-    return streamer(stream, key)
+    return stream
   }
 
   function get(key, opts) {
     var _key = hash(key)
     var dir  = _key.substring(0, 2)
-    return streamer(fs.createReadStream(join(basedir, dir, key), opts), key)
+    return fs.createReadStream(join(basedir, dir, key), opts)
   }
 
   function has(key, callback) {
@@ -83,33 +103,39 @@ function kvdb (basedir, streamer) {
   function list() {
     return Object.keys(keys)
   }
+
   function addToKeys (data) {
     if(data[0] = 'put')
-      keys[key] = true
+      keys[data[1]] = true
     else
-      delete keys[key] 
+      delete keys[data[1]] 
   }
-  var ls = put('__list', {flags: 'a'})
-  emitter
-    .on('put', function (key, time) {
-      ls.write(['put', key, time])
-    })
-    .on('del', function (key, time) {
-      ls.write(['del', key, time]) 
-    })
-    .on('put', addToKeys)
-    .on('del', addToKeys)
-
-  get('__list').pipe(es.parse()).on('data', addToKeys).on('end', function () {
-    emitter.emit('sync')
-  })
-
-  emitter.put = put
-  emitter.get = get
+  //wrap formats arount get and put, so you can go get.json(key) or get.raw(key)
+  emitter.put = addFormats(put)
+  emitter.get = addFormats(get)
   emitter.del = del
   emitter.has = has
   emitter.list = list
-  return emitter
+
+  //TODO smarter way to compact the __list, so that can have last update.
+  var ls = emitter.put.json('__list', {flags: 'a'})
+  emitter
+    .on('put', function (key, time) {
+      if(!keys[key])
+        ls.write(['put', key, time])
+    })
+    .on('del', function (key, time) {
+      if(keys[key])
+        ls.write(['del', key, time]) 
+    })
+    .on('put', addToKeys)
+    .on('del', addToKeys)
+  
+  emitter.get.json('__list').on('data', addToKeys).on('end', function () {
+    emitter.emit('sync')
+  })
+
+ return emitter
 }
 
 
@@ -119,8 +145,8 @@ if(!module.parent) {
   var key = argv._[1]
   var base = argv.base || argv.b || process.env.KV_BASE
 
-  if(!~['put', 'get', 'del', 'has'].indexOf(op)
-    || (!key || key.length < 1) || !base) {
+  if (!~['put', 'get', 'del', 'has'].indexOf(op) && 
+     (!key || key.length < 1) && op !== 'list' || !base) {
     var e = console.error
     e('USAGE: kv put|get|del|has $KEY --base $BASEDIR')
     e('')
@@ -136,12 +162,12 @@ if(!module.parent) {
     process.exit(1)
   }
 
-  var kv = kvdb(base, id) //do not convert to json
+  var kv = kvdb(base)
 
   if(op == 'get') 
-    kv.get(key).pipe(process.stdout)
+    kv.get.raw(key).pipe(process.stdout)
   else if (op == 'put')
-    process.stdin.pipe(kv.put(key))
+    process.stdin.pipe(kv.put.raw(key))
   else if (op == 'del')
     kv.del(key, function () {})
   else if (op == 'has')
@@ -149,4 +175,9 @@ if(!module.parent) {
       if(err) console.error(err.message)
       process.exit(has ? 0 : 1)
     })
+  else if (op == 'list') {
+    kv.on('sync', function () {
+      console.log(kv.list().join('\n'))
+    })
+  }
 }
