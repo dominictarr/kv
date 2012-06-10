@@ -131,8 +131,13 @@ function kvdb (basedir) {
     .on('put', addToKeys)
     .on('del', addToKeys)
   
-  emitter.get.json('__list').on('data', addToKeys).on('end', function () {
-    emitter.emit('sync')
+  emitter.has('__list', function (err) {
+    if(err)
+      emitter.emit('sync')
+    else
+      emitter.get.json('__list').on('data', addToKeys).on('end', function () {
+        emitter.emit('sync')
+      })
   })
 
  return emitter
