@@ -9,7 +9,7 @@ module.exports = function (prefix, exports) {
   exports.put = function (key, opts) {
     var _key = prefix+':'+key
     opts = opts || {flags: 'w'}
-    if(opts.flags !== 'a')
+    if(opts.flags !== 'a' || !localStorage[_key])
       localStorage[_key] = ''
     //assume write if not explicit append.
 
