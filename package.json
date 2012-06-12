@@ -13,8 +13,9 @@
   , "mkdirp":  "0.3"
   },
   "bin" : {
-    "kv": "./index.js"
+    "kv": "./cli.js"
   },
   "devDependencies": {},
-  "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)"
+  "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
+  "browserify": "./client.js"
 }
