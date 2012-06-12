@@ -22,11 +22,16 @@ module.exports = function (basedir, exports) {
     var _key = hash(key)
     var dir  = _key.substring(0, 2)
     var file = key
-    var stream = es.gate(true)
+    var stream = es.gate(true), inner
     mkdirP(join(basedir, dir), function (err) {
       if(err)
         return stream.emit('error', err)
-      stream.pipe(fs.createWriteStream(join(basedir, dir, file), opts))
+      stream.pipe(
+        fs.createWriteStream(join(basedir, dir, file), opts)
+        .on('close', function () {
+          stream.emit('close')
+        })
+      )
       stream.open()
     })
     return stream
