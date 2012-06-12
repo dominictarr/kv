@@ -9,9 +9,9 @@ module.exports = function (prefix, exports) {
   exports.put = function (key, opts) {
     var _key = prefix+':'+key
     opts = opts || {flags: 'w'}
-    if(opts.flags == 'w')
+    if(opts.flags !== 'a')
       localStorage[_key] = ''
-    //else assume append.
+    //assume write if not explicit append.
 
     var ws = es.through(function (data) {
       localStorage[_key] += JSON.stringify(data) + '\n'
