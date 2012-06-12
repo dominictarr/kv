@@ -8,14 +8,16 @@
     "url": "https://github.com/dominictarr/kv.git"
   },
   "dependencies": {
-    "optimist": "~0.3.4"
-  , "event-stream": "0.10"
-  , "mkdirp":  "0.3"
+    "optimist": "~0.3.4",
+    "event-stream": "~2",
+    "mkdirp": "0.3"
   },
-  "bin" : {
+  "bin": {
     "kv": "./cli.js"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "rimraf": "~2.0.2"
+  },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
   "browserify": "./client.js"
 }
