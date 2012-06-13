@@ -27,7 +27,7 @@ module.exports = function (prefix, exports) {
 
   exports.get = function (key, opts) { 
     var _key = prefix+':'+key
-    var array = localStorage[_key].split('\n')
+    var array = localStorage[_key].split(/(\n)/)
     if(!array[array.length - 1])
       array.pop() //expecting an empty '' at the end.
     return es.readArray(array) 
