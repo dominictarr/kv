@@ -19,7 +19,7 @@ var kv = require('kv')('/tmp/kv')
 ```
 ### put a stream
 
-`opts` is optional. see [http://nodejs.org/api/fs.html#fs_fs_createreadstream_path_options ](fs.createWriteStream)
+`opts` is optional. see [fs.createWriteStream](http://nodejs.org/api/fs.html#fs_fs_createreadstream_path_options)
 
 ``` js
 stream.pipe(kv.put(key, opts))
@@ -27,7 +27,7 @@ stream.pipe(kv.put(key, opts))
 
 ### get a stream
 
-`opts` is optional. see [http://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options ](fs.createReadStream)
+`opts` is optional. see [fs.createReadStream](http://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options)
 
 ``` js
 kv.get(key, opts).pipe(stream) 
@@ -41,7 +41,7 @@ kv.del(key, callback)
 
 ### list
 
-all changes are logged to a special document, `'\_\_list'`. 
+all changes are logged to a special document, `'__list'`. 
 
 ### has
 
