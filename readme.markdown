@@ -39,9 +39,12 @@ kv.get(key, opts).pipe(stream)
 kv.del(key, callback)
 ```
 
-### list
+### list of keys
 
-all changes are logged to a special document, `'__list'`. 
+``` js
+kv.list() //yes, it's sync
+
+```
 
 ### has
 
