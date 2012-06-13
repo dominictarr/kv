@@ -69,11 +69,11 @@ module.exports = function (endpoints) {
       return _keys
     }
 
-    function addToKeys (data) {
-      if(data[0] = 'put')
-        keys[data[1]] = true
+    function addToKeys (key, time, stream) {
+      if(stream)
+        keys[key] = true
       else
-        delete keys[data[1]] 
+        delete keys[key] 
     }
     //wrap formats arount get and put, so you can go get.json(key) or get.raw(key)
 
