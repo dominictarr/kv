@@ -14,7 +14,7 @@ module.exports = function (prefix, exports) {
     //assume write if not explicit append.
 
     var ws = es.through(function (data) {
-      localStorage[_key] += JSON.stringify(data) + '\n'
+      localStorage[_key] += data + '\n'
     })
 
     //remove readable api.
