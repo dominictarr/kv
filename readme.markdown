@@ -2,7 +2,9 @@
 
 super simple key-value store, intended for keeping appendable files.
 
-keeps the files in prefixed subdirectories, so that the directories do not get too large.
+works on the server, with files, _and in the browser_ with `localStorage`.
+
+on the server, it keeps the files in prefixed subdirectories, so that the directories do not get too large.
 
 (see ls .git/objects/\* for a similar example)
 
@@ -14,9 +16,13 @@ keeps the files in prefixed subdirectories, so that the directories do not get t
 by default, the stream is handled as newline seperated json.
 
 ```
+//server
 var kv = require('kv')('/tmp/kv')
-
+//client
+var kv = require('kv')('kv:') //this will be prefixed to keys when saving in localStorage.
 ```
+
+
 ### put a stream
 
 `opts` is optional. see [fs.createWriteStream](http://nodejs.org/api/fs.html#fs_fs_createreadstream_path_options)
