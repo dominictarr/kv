@@ -15,9 +15,9 @@ module.exports = function (basedir, exports) {
 
   /*
   okay, so this is gonna run in the browser, attached to localStorage also.
-  
 
-*/ 
+
+*/
   exports.put = function (key, opts) {
     var _key = hash(key)
     var dir  = _key.substring(0, 2)
@@ -40,19 +40,29 @@ module.exports = function (basedir, exports) {
   exports.get = function (key, opts) {
     var _key = hash(key)
     var dir  = _key.substring(0, 2)
-    return fs.createReadStream(join(basedir, dir, key), opts)
+    var stream = es.gate(true)
+    exports.has(key, function (err, stat) {
+      if (err)
+        return stream.end()
+
+      stream.open()
+
+      fs.createReadStream(join(basedir, dir, key), opts)
+        .pipe(stream)
+    })
+    return stream
   }
 
   exports.has = function (key, callback) {
     var _key = hash(key)
     var dir  = _key.substring(0, 2)
-    fs.stat(join(basedir, dir, key), callback) 
+    fs.stat(join(basedir, dir, key), callback)
   }
- 
+
   function del(key, cb) {
     var _key = hash(key)
     var dir  = _key.substring(0, 2)
-    var file = _key.substring(2)    
+    var file = _key.substring(2)
   }
 
   return exports

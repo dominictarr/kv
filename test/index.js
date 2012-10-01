@@ -20,5 +20,8 @@ rm('/tmp/kv_test', function () {
       assert.equal(data.hello, r)
     })
   })
+
+  // should not throw for getting keys that does not exist
+  kv.get("bar")
 })
 
