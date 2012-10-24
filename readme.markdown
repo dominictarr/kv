@@ -48,7 +48,7 @@ kv.del(key, callback)
 ### list of keys
 
 ``` js
-kv.list() //yes, it's sync
+kv.list().pipe(stream)
 
 ```
 

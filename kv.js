@@ -6,7 +6,7 @@
 
 var es     = require('event-stream')
 var EventEmitter = require('events').EventEmitter
-
+var timestamp    = require('monotonic-timestamp')
 var formats = {
   raw: function (stream) {
     return stream
@@ -60,23 +60,30 @@ module.exports = function (endpoints) {
     //by default, use newline seperated json.
     var emitter = new EventEmitter()
     var keys = {}
+    var kary = []
     var ends = endpoints(basedir)
 
     function list() {
+      return kary
+      /*
       var _keys = []
       for (var k in keys)
         _keys.push(k)
       return _keys
+      */
     }
 
+    //that was a silly name.
+    /*
     function addToKeys (key, time, stream) {
       if(stream)
         keys[key] = true
       else
         delete keys[key] 
     }
-    //wrap formats arount get and put, so you can go get.json(key) or get.raw(key)
+    */
 
+    //wrap formats arount get and put, so you can go get.json(key) or get.raw(key)
     emitter.put = addFormats(function (key, opts) {
       var s = ends.put(key, opts)
       emitter.emit('put', key, Date.now(), s, opts)
@@ -88,24 +95,28 @@ module.exports = function (endpoints) {
       ends.del(key, cb)
     }
     emitter.has = ends.has
-    emitter.list = list
+    emitter.list = function () {
+      return es.from(kary)
+    }
 
     //TODO smarter way to compact the __list, so that can have last update.
     var ls = emitter.put.json('__list', {flags: 'a'})
     emitter
       .on('put', function (key, time) {
-        if(!keys[key])
+        if(!keys[key]) {
+          kary.push(key)
           ls.write(['put', key, time])
+        }
       })
       .on('del', function (key, time) {
-        if(keys[key])
+        if(keys[key]) {
+          kary.push(key)
           ls.write(['del', key, time]) 
+        }
       })
-      .on('put', addToKeys)
-      .on('del', addToKeys)
     
     emitter.has('__list', function (err) {
-      if(err)
+      if(err) //there arn't any documents stored yet.
         emitter.emit('sync')
       else
         emitter.get.json('__list').on('data', addToKeys).on('end', function () {
