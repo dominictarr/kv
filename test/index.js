@@ -2,6 +2,12 @@
 
 var rm = require('rimraf')
 var assert = require('assert')
+var es = require('event-stream')
+var passed = false
+
+process.on('exit', function () {
+  assert(passed)
+})
 
 rm('/tmp/kv_test', function () {
 
@@ -18,7 +24,13 @@ rm('/tmp/kv_test', function () {
     var g = kv.get('hello')
     g.on('data', function (data) {
       assert.equal(data.hello, r)
+      passed = true
     })
   })
+
+  kv.list()
+    .pipe(es.writeArray(function (err, ary) {
+      assert.deepEqual(ary, ['hello'])
+    }))
 })
 
