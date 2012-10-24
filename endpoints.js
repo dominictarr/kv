@@ -22,7 +22,7 @@ module.exports = function (basedir, exports) {
     var _key = hash(key)
     var dir  = _key.substring(0, 2)
     var file = key
-    var stream = es.gate(true), inner
+    var stream = es.pause().pause(), inner
     mkdirP(join(basedir, dir), function (err) {
       if(err)
         return stream.emit('error', err)
@@ -32,7 +32,7 @@ module.exports = function (basedir, exports) {
           stream.emit('close')
         })
       )
-      stream.open()
+      stream.resume()
     })
     return stream
   }
