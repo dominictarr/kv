@@ -9,14 +9,18 @@
   },
   "dependencies": {
     "optimist": "~0.3.4",
-    "event-stream": "~2",
-    "mkdirp": "0.3"
+    "event-stream": "~3.0.7",
+    "mkdirp": "~0.3.4",
+    "monotonic-timestamp": "0.0.3"
   },
   "bin": {
     "kv": "./cli.js"
   },
   "devDependencies": {
     "rimraf": "~2.0.2"
+  },
+  "scripts": {
+    "test": "set -e; for t in test/*.js; do node $t; done"
   },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
   "browserify": "./client.js"
