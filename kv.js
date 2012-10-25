@@ -43,7 +43,11 @@ var formats = {
 
 function mkFormat(fn, format) {
   return function () {
-    return format(fn.apply(this, arguments))
+    var args = [].slice.call(arguments)
+    args[0] = encodeURIComponent(args[0])
+//    args[0].split('/').join('-')
+//    console.log(args)
+    return format(fn.apply(this, args))
   }
 }
 
@@ -74,14 +78,20 @@ module.exports = function (endpoints) {
     }
 
     //that was a silly name.
-    /*
+    
     function addToKeys (key, time, stream) {
-      if(stream)
+      key = decodeURIComponent(key)
+      if(stream) {
         keys[key] = true
-      else
-        delete keys[key] 
+        kary.push(key)
+        ls.write(['put', key, time])
+      } else {
+        delete keys[key]
+        var i = kary.indexOf(key)
+        if(~i) kary.splice(i, 1)
+        ls.write(['del', key, time]) 
+      }
     }
-    */
 
     //wrap formats arount get and put, so you can go get.json(key) or get.raw(key)
     emitter.put = addFormats(function (key, opts) {
@@ -102,19 +112,8 @@ module.exports = function (endpoints) {
     //TODO smarter way to compact the __list, so that can have last update.
     var ls = emitter.put.json('__list', {flags: 'a'})
     emitter
-      .on('put', function (key, time) {
-        if(!keys[key]) {
-          kary.push(key)
-          ls.write(['put', key, time])
-        }
-      })
-      .on('del', function (key, time) {
-        if(keys[key]) {
-          kary.push(key)
-          ls.write(['del', key, time]) 
-        }
-      })
-    
+      .on('put', addToKeys)
+      .on('del', addToKeys)
     emitter.has('__list', function (err) {
       if(err) //there arn't any documents stored yet.
         emitter.emit('sync')
