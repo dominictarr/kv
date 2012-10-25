@@ -104,7 +104,9 @@ module.exports = function (endpoints) {
       emitter.emit('del', key, Date.now())
       ends.del(key, cb)
     }
-    emitter.has = ends.has
+    emitter.has = function (key, cb) {
+      return ends.has(encodeURIComponent(key), cb)
+    }
     emitter.list = function () {
       return es.from(kary)
     }
