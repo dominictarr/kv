@@ -37,6 +37,10 @@ var formats = {
       s.pipe(stream)
     } else
       s = stream.pipe(es.split()).pipe(es.parse())
+
+    stream.on('error', function (err) {
+      s.emit('error', err)
+    })
     return s 
   }
 }
