@@ -100,6 +100,11 @@ module.exports = function (endpoints) {
       return s
     })
     emitter.get = addFormats(ends.get)
+ 
+    //synonyms
+    emitter.createWriteStream = emitter.put
+    emitter.createReadStream = emitter.get
+
     emitter.del = function (key, cb) {
       emitter.emit('del', key, Date.now())
       ends.del(key, cb)
