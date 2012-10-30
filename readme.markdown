@@ -31,6 +31,8 @@ var kv = require('kv')('kv:') //this will be prefixed to keys when saving in loc
 stream.pipe(kv.put(key, opts))
 ```
 
+`kv.createWriteStream` is a synonym for `kv.put`
+
 ### get a stream
 
 `opts` is optional. see [fs.createReadStream](http://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options)
@@ -38,6 +40,7 @@ stream.pipe(kv.put(key, opts))
 ``` js
 kv.get(key, opts).pipe(stream) 
 ```
+`kv.createReadStream` is a synonym for `kv.get`
 
 ### del a stream
 
