@@ -6,7 +6,7 @@
 
 var es     = require('event-stream')
 var EventEmitter = require('events').EventEmitter
-var timestamp    = require('monotonic-timestamp')
+
 var formats = {
   raw: function (stream) {
     return stream
@@ -113,9 +113,11 @@ module.exports = function (endpoints) {
       emitter.emit('del', key, Date.now())
       ends.del(key, cb)
     }
+    emitter.unlink = emitter.del
     emitter.has = function (key, cb) {
       return ends.has(encodeURIComponent(key), cb)
     }
+    emitter.stat = emitter.has
     emitter.list = function () {
       return es.from(kary)
     }

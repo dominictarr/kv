@@ -10,8 +10,7 @@
   "dependencies": {
     "optimist": "~0.3.4",
     "event-stream": "~3.0.7",
-    "mkdirp": "~0.3.4",
-    "monotonic-timestamp": "0.0.3"
+    "mkdirp": "~0.3.4"
   },
   "bin": {
     "kv": "./cli.js"
