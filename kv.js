@@ -6,6 +6,7 @@
 
 var es     = require('event-stream')
 var EventEmitter = require('events').EventEmitter
+var timestamp    = require('monotonic-timestamp')
 
 var formats = {
   raw: function (stream) {
@@ -83,24 +84,23 @@ module.exports = function (endpoints) {
 
     //that was a silly name.
     
-    function addToKeys (key, time, stream) {
+    function addKeys (key, time, stream) {
       key = decodeURIComponent(key)
-      if(stream) {
         keys[key] = true
         kary.push(key)
         ls.write(['put', key, time])
-      } else {
+    }
+    function delKeys (key, time) {
         delete keys[key]
         var i = kary.indexOf(key)
         if(~i) kary.splice(i, 1)
         ls.write(['del', key, time]) 
-      }
     }
 
     //wrap formats arount get and put, so you can go get.json(key) or get.raw(key)
     emitter.put = addFormats(function (key, opts) {
       var s = ends.put(key, opts)
-      emitter.emit('put', key, Date.now(), s, opts)
+      emitter.emit('put', key, timestamp(), s, opts)
       return s
     })
     emitter.get = addFormats(ends.get)
@@ -110,7 +110,7 @@ module.exports = function (endpoints) {
     emitter.createReadStream = emitter.get
 
     emitter.del = function (key, cb) {
-      emitter.emit('del', key, Date.now())
+      emitter.emit('del', key, timestamp())
       ends.del(key, cb)
     }
     emitter.unlink = emitter.del
@@ -125,13 +125,25 @@ module.exports = function (endpoints) {
     //TODO smarter way to compact the __list, so that can have last update.
     var ls = emitter.put.json('__list', {flags: 'a'})
     emitter
-      .on('put', addToKeys)
-      .on('del', addToKeys)
+      .on('put', addKeys)
+      .on('del', delKeys)
     emitter.has('__list', function (err) {
       if(err) //there arn't any documents stored yet.
         emitter.emit('sync')
       else
-        emitter.get.json('__list').on('data', addToKeys).on('end', function () {
+        emitter.get.json('__list').on('data', function (data) {
+          var type = data.shift()
+          var key  = data.shift()
+          var ts   = data.shift()
+          if(type == 'put') {
+            keys[key] = true
+            kary.push(key)
+          } else {
+            delete keys[key]
+            var i = kary.indexOf(key)
+            if(~i) kary.splice(i, 1)
+          }
+        }).on('end', function () {
           emitter.emit('sync')
         })
     })
