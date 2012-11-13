@@ -119,6 +119,7 @@ module.exports = function (endpoints) {
     }
     emitter.stat = emitter.has
     emitter.list = function () {
+      //TODO: add tail option...
       return es.from(kary)
     }
 

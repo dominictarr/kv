@@ -14,7 +14,7 @@ module.exports = function (prefix, exports) {
     //assume write if not explicit append.
 
     var ws = es.through(function (data) {
-      localStorage[_key] += data + '\n'
+      localStorage[_key] += data
     })
 
     //remove readable api.
@@ -27,9 +27,7 @@ module.exports = function (prefix, exports) {
 
   exports.get = function (key, opts) { 
     var _key = prefix+':'+key
-    var array = localStorage[_key].split(/(\n)/)
-    if(!array[array.length - 1])
-      array.pop() //expecting an empty '' at the end.
+    var array = [localStorage[_key]]
     return es.readArray(array) 
   }
 
