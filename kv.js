@@ -111,7 +111,7 @@ module.exports = function (endpoints) {
 
     emitter.del = function (key, cb) {
       emitter.emit('del', key, timestamp())
-      ends.del(key, cb)
+      ends.del(encodeURIComponent(key), cb)
     }
     emitter.unlink = emitter.del
     emitter.has = function (key, cb) {
