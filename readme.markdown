@@ -2,7 +2,7 @@
 
 super simple key-value store, intended for keeping appendable files.
 
-works on the server, with files, _and in the browser_ with `localStorage`.
+works on the server, with files or redis _and in the browser_ with `localStorage`.
 
 on the server, it keeps the files in prefixed subdirectories, so that the directories do not get too large.
 
@@ -16,8 +16,10 @@ on the server, it keeps the files in prefixed subdirectories, so that the direct
 by default, the stream is handled as newline seperated json.
 
 ```
-//server
+//files
 var kv = require('kv')('/tmp/kv')
+//redis
+var kv = require('kv/redis')('redis://password@localhost:6379/prefix')
 //client
 var kv = require('kv')('kv:') //this will be prefixed to keys when saving in localStorage.
 ```
