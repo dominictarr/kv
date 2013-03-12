@@ -11,6 +11,7 @@ function hash (key) {
 }
 
 module.exports = function (basedir, exports) {
+  basedir = basedir || ''
   exports = exports || {}
 
   /*
