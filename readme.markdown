@@ -12,6 +12,10 @@ on the server, it keeps the files in prefixed subdirectories, so that the direct
 
 ###create an instance
 
+`kv(path/prefix/connectString, setup)`
+
+`path` is where to create/connect to the store.
+
 `setup` is optional. `setup` is passed the stream created by `put` and `get`, may replace the stream passed to put/get
 by default, the stream is handled as newline seperated json.
 
